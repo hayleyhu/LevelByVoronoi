@@ -3,20 +3,24 @@ local astar = require("astar.lua")
 local util = require("util.lua")
 
 function weighted_voronoi_diagram(graph, centers)
-	local migrating_candidates = {}
+	-- local migrating_candidates = {}
 	distances = construct_voronoi(graph, centers, migrating_candidates)
 	local meanDiff = calculate_mean_diff(graph)
+	print("meanDiff: ", meanDiff)
 	local k=0
 	local initialDistances = util.deepcopy(distances)
 	repeat 
-		k += 1
+		k = k+1
+		print("k:",k)
 		leastDifficultCenter = updateDifficulties( centers)
+		print("leastDifficultCenter: ", leastDifficultCenter.id)
 		updateDistances( graph, centers, initialDistances, meanDiff )
-		candidates = findMigrationCandidates(graph,leastDifficultCenter)
+		candidates = findMigrationCandidates(graph,centers, distances, leastDifficultCenter)
+		print("#candidates: ",#candidates)
 		--mean_Diff = calculate_mean_diff(graph)
 		transferPoints(graph,candidates)
 		-- construct_voronoi(graph, centers, migrating_candidates)
-	until (#migrating_candidates==0)
+	until (#candidates==0)
 end
 
 function updateDistances( graph , listCenters, distances, initialDistances, meanDiff)
@@ -27,7 +31,6 @@ function updateDistances( graph , listCenters, distances, initialDistances, mean
 			end
 		end
 	end
-	return updateDifficulties(listCenters)
 end
 
 function updateDifficulties( listCenters )
@@ -47,7 +50,7 @@ function updateDifficulties( listCenters )
 	return leastDifficultCenter
 end
 
-function findMigrationCandidates(graph,centers distances, leastDifficultCenter)
+function findMigrationCandidates(graph,centers,distances, leastDifficultCenter)
 	local migrationCandidates = {}
 	for i,node in ipairs(graph.nodeList) do
 		if not node.isCenter and node.currentClosest ~= leastDifficultCenter then
@@ -82,7 +85,7 @@ function calculate_mean_diff(graph)
 	local r = #graph.nodeList
 	local sum = 0
 	for i,v in ipairs(graph.nodeList) do
-		sum += v.mDifficulty
+		sum = sum+v.mDifficulty
 	end
 	return sum/r
 end
@@ -120,22 +123,24 @@ function construct_voronoi(graph, centers, migrating_candidates)
 			node.currentClosest = currentClosest
 			if (currentClosest==leastCenter) then
 				table.insert(migrating_candidates, v)
+			end
 			table.insert(currentClosest.members, v)
-			currentClosest.districtDifficulty += v.mDifficulty
+			currentClosest.districtDifficulty = currentClosest.districtDifficulty+v.mDifficulty
 		end
 	end
 	return distances
 end
 
 
--- function updateDistances( distances,graph,centers ,initial_distances)
--- 	for i,v in ipairs(distances) do
--- 		if (not graph.NodeList.i.isCenter) then
--- 			for j,v2 in ipairs(v) do
--- 				if (graph.NodeList.j.isCenter) then
--- 					distances.i.j = (initial_distances.i.s*difficulties.i)/mean_Diff
--- 				end
--- 			end
--- 		end
--- 	end
--- end
+node1 = Node:init(1, 1, 0, 1,true)
+node2 = Node:init(2, 2, 0, 99, false)
+node3 = Node:init(3, 3, 0, 99, false)
+node4 = Node:init(4, 101, 0, 1,true)
+
+edge12 = Edge:init(node1,node2)
+edge23 = Edge:init(node2,node3)
+edge34 = Edge:init(node3,node4)
+testNodeList = {node1, node2, node3, node4}
+testGraph = Graph:init(testNodeList)
+weighted_voronoi_diagram(testGraph)
+

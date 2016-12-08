@@ -21,7 +21,7 @@ function dist_between ( nodeA, nodeB )
 end
 
 function dist_edge( nodeA, nodeB, distances )
-	return distances[nodeA][nodeB]
+	return nodeA.edges[nodeB]
 end
 
 
