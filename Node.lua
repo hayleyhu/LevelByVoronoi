@@ -1,4 +1,5 @@
-local Class = require("class.lua")
+print "Hello here"
+local Class = require("class")
 
 local Node = {}
 Node = Class.create("Node", Entity)
@@ -28,7 +29,7 @@ function Node:init(id, x, y, diff, isCenter)
 end
 
 function Node:clearDistrictDiff()
-	if self.isCenter
+	if self.isCenter then
 		self.districtDifficulty = self.mDifficulty;
 	end
 end

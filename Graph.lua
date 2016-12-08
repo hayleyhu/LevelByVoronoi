@@ -1,10 +1,9 @@
-local Class = require("class.lua")
+local Class = require("class")
 
 local Graph = Class.create("Graph", Entity)
 
 function Graph:init(NodeList)
 	self.nodeList = NodeList
-	self.mean_Diff = calculate_mean_diff(self.nodeList)
 end
 
 return Graph

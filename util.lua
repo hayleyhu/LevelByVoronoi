@@ -1,16 +1,3 @@
-
-local Global = require "libs.Global"
-
-Global{
-	-- Box2D collision filter masks --
-	CL_INT   = 0x0001,
-	CL_WALL  = 0x0002,
-  CL_PLAT  = 0x0003,
-	CL_NPC   = 0x0004,
-	CL_CHAR  = 0x0008,
-	CL_FX	 = 0x0009,
-}
-
 local util = {}
 
 ----

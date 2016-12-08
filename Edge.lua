@@ -1,5 +1,5 @@
-local Class = require("class.lua")
-
+local Class = require("class")
+print "loading Edge"
 local Edge = Class.create("Edge", Entity)
 
 function Edge:init(node1, node2, weight)

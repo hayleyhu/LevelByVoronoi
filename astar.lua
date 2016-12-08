@@ -1,4 +1,5 @@
 local astar = {}
+local util = require"util"
 ----------------------------------------------------------------
 -- local variables
 ----------------------------------------------------------------
@@ -27,10 +28,12 @@ end
 
 astar.calculatePathDist = function ( nodeList )
 	local distance = 0
+	print "calculating path distance"
 	local lastNode = nodeList[1]
-	for i=2,#nodeList - 1 do
-		if  nodeList.edges[nodeList[i + 1]] then
-			distance = distance + nodeList.edges[nodeList[i + 1]].weight
+	util.print_table(nodeList.edges)
+	for i=1,#nodeList - 1 do
+		if  nodeList[i].edges[nodeList[i + 1]] then
+			distance = distance + nodeList[i].edges[nodeList[i + 1]].weight
 		else
 			distance = 9999999
 			break
@@ -41,16 +44,17 @@ end
 
 
 function heuristic_cost_estimate ( nodeA, nodeB )
-
 	return dist ( nodeA.x, nodeA.y, nodeB.x, nodeB.y )
 end
 
 function is_valid_node ( node, neighbor )
-	for i,v in ipairs(node.neighbors)
-		if v==neighbor
+	print "calculating valid node"
+	for i,v in ipairs(node.neighbors) do
+		if v==neighbor then
 			return true
 		end
 	end
+	print "not valid"
 	return false
 end
 
@@ -69,10 +73,13 @@ end
 function neighbor_nodes ( theNode, nodes )
 
 	local neighbors = {}
-	for _, node in ipairs ( nodes ) do
-		if theNode ~= node and is_valid_node ( theNode, node ) then
-			table.insert ( neighbors, node )
-		end
+	-- for _, node in ipairs ( nodes ) do
+	-- 	if theNode ~= node and is_valid_node ( theNode, node ) then
+	-- 		table.insert ( neighbors, node )
+	-- 	end
+	-- end
+	for i,v in ipairs(theNode.neighbors) do
+		table.insert(neighbors,v)
 	end
 	return neighbors
 end
@@ -122,7 +129,7 @@ astar.solve = function ( start, goal, nodes, valid_node_func , distances)
 	f_score [ start ] = g_score [ start ] + heuristic_cost_estimate ( start, goal )
 
 	while #openset > 0 do
-	
+
 		local current = lowest_f_score ( openset, f_score )
 		if current == goal then
 			local path = unwind_path ( {}, came_from, goal )
@@ -133,7 +140,7 @@ astar.solve = function ( start, goal, nodes, valid_node_func , distances)
 		remove_node ( openset, current )		
 		table.insert ( closedset, current )
 		
-		local neighbors = neighbor_nodes ( current, nodes )
+		local neighbors = neighbor_nodes ( current )
 		for _, neighbor in ipairs ( neighbors ) do 
 			if not_in ( closedset, neighbor ) then
 			
@@ -150,6 +157,7 @@ astar.solve = function ( start, goal, nodes, valid_node_func , distances)
 			end
 		end
 	end
+	print "No Valid Path"
 	return nil -- no valid path
 end
 

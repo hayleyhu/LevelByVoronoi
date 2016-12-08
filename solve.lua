@@ -1,9 +1,12 @@
-local Node = require("Node.lua")
-local astar = require("astar.lua")
-local util = require("util.lua")
+local Node = require("Node")
+local Edge = require("Edge")
+local Graph = require("Graph")
+local astar = require("astar")
+local util = require("util")
 
 function weighted_voronoi_diagram(graph, centers)
 	-- local migrating_candidates = {}
+	print "starting Weighted Voronoi diagram"
 	distances = construct_voronoi(graph, centers, migrating_candidates)
 	local meanDiff = calculate_mean_diff(graph)
 	print("meanDiff: ", meanDiff)
@@ -14,18 +17,20 @@ function weighted_voronoi_diagram(graph, centers)
 		print("k:",k)
 		leastDifficultCenter = updateDifficulties( centers)
 		print("leastDifficultCenter: ", leastDifficultCenter.id)
+		print("-----")
+		util.print_table(initialDistances)
 		updateDistances( graph, centers, initialDistances, meanDiff )
 		candidates = findMigrationCandidates(graph,centers, distances, leastDifficultCenter)
 		print("#candidates: ",#candidates)
 		--mean_Diff = calculate_mean_diff(graph)
-		transferPoints(graph,candidates)
+		transferPoints(graph,candidates,leastDifficultCenter)
 		-- construct_voronoi(graph, centers, migrating_candidates)
 	until (#candidates==0)
 end
 
-function updateDistances( graph , listCenters, distances, initialDistances, meanDiff)
+function updateDistances( graph , listCenters, initialDistances, meanDiff)
 	for i,node in ipairs(graph.nodeList) do
-		if not v.isCenter then
+		if not node.isCenter then
 			for j,center in ipairs(listCenters) do
 				distances[node.id][center.id] = (center.distPrevDifficulty * initialDistances[node.id][center.id]) / meanDiff
 			end
@@ -37,7 +42,7 @@ function updateDifficulties( listCenters )
 	local leastDifficultCenter = nil;
 	local leastDifficultSum = 999999
 	for i,center in ipairs(listCenters) do
-		local total 
+		local total = 0;
 		for i,v in ipairs(center.members) do
 			total = total + v.mDifficulty
 		end
@@ -46,6 +51,9 @@ function updateDifficulties( listCenters )
 			leastDifficultCenter = center
 		end
 		center.districtDifficulty = total
+		if not center.distPrevDifficulty then
+			center.distPrevDifficulty = center.districtDifficulty
+		end
 	end
 	return leastDifficultCenter
 end
@@ -70,10 +78,10 @@ end
 
 function transferPoints( graph, candidateList ,leastDifficultCenter)
 	for i,candidate in ipairs(candidateList) do
-		local prevCenter = candidates.currentClosest
+		local prevCenter = candidate.currentClosest
 		prevCenter.distPrevDifficulty = prevCenter.districtDifficulty
 		prevCenter.districtDifficulty = prevCenter.districtDifficulty - candidate.mDifficulty
-		table.remove(prevCenter.members, util.find(prevCenter.members, candidate))
+		util.deleteFromTable(prevCenter.members, candidate)
 
 		table.insert(leastDifficultCenter.members,candidate)
 		leastDifficultCenter.distPrevDifficulty = leastDifficultCenter.districtDifficulty
@@ -108,12 +116,14 @@ function construct_voronoi(graph, centers, migrating_candidates)
 	end
 
 	local distances = {}
-	for i,node in ipairs(graph.NodeList) do
+	for i,node in ipairs(graph.nodeList) do
 		if (not node.isCenter) then
 			local currentClosest = nil
 			local minDistance = 100000
 			for j,c in ipairs(centers) do
-				local pathDist = astar.calculatePathDist(astar.path(node, c, graph))
+				local path = astar.path(node, c, graph)
+				local pathDist = astar.calculatePathDist(path)
+				if not distances[node.id] then distances[node.id] = {} end
 				distances[node.id][c.id] = pathDist
 				if (pathDist < minDistance) then
 					minDistance = pathDist
@@ -122,25 +132,25 @@ function construct_voronoi(graph, centers, migrating_candidates)
 			end
 			node.currentClosest = currentClosest
 			if (currentClosest==leastCenter) then
-				table.insert(migrating_candidates, v)
+				table.insert(migrating_candidates, node)
 			end
-			table.insert(currentClosest.members, v)
-			currentClosest.districtDifficulty = currentClosest.districtDifficulty+v.mDifficulty
+			table.insert(currentClosest.members, node)
+			currentClosest.districtDifficulty = currentClosest.districtDifficulty+node.mDifficulty
 		end
 	end
 	return distances
 end
 
+print "Starting test trial"
+node1 = Node(1, 1, 0, 1,true)
+node2 = Node(2, 2, 0, 99, false)
+node3 = Node(3, 3, 0, 99, false)
+node4 = Node(4, 101, 0, 1,true)
 
-node1 = Node:init(1, 1, 0, 1,true)
-node2 = Node:init(2, 2, 0, 99, false)
-node3 = Node:init(3, 3, 0, 99, false)
-node4 = Node:init(4, 101, 0, 1,true)
-
-edge12 = Edge:init(node1,node2)
-edge23 = Edge:init(node2,node3)
-edge34 = Edge:init(node3,node4)
+edge12 = Edge(node1,node2)
+edge23 = Edge(node2,node3)
+edge34 = Edge(node3,node4)
 testNodeList = {node1, node2, node3, node4}
-testGraph = Graph:init(testNodeList)
-weighted_voronoi_diagram(testGraph)
+testGraph = Graph(testNodeList)
+weighted_voronoi_diagram(testGraph,{node1,node4})
 
