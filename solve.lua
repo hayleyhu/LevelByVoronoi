@@ -17,8 +17,6 @@ function weighted_voronoi_diagram(graph, centers)
 		print("k:",k)
 		leastDifficultCenter = updateDifficulties( centers)
 		print("leastDifficultCenter: ", leastDifficultCenter.id)
-		print("-----")
-		util.print_table(initialDistances)
 		updateDistances( graph, centers, initialDistances, meanDiff )
 		candidates = findMigrationCandidates(graph,centers, distances, leastDifficultCenter)
 		print("#candidates: ",#candidates)
@@ -26,6 +24,18 @@ function weighted_voronoi_diagram(graph, centers)
 		transferPoints(graph,candidates,leastDifficultCenter)
 		-- construct_voronoi(graph, centers, migrating_candidates)
 	until (#candidates==0)
+	print("======")
+	for i,v in ipairs(graph.nodeList) do
+		print("---Node: " .. v.id)
+		print("X: " .. v.x)
+		print("Y: " .. v.y)
+		if v.isCenter then
+			print("I am a Center")
+		else
+			print("Closest Center " .. v.currentClosest.id)
+			print("distance to Center: " .. distances[v.id][v.currentClosest.id])
+		end
+	end
 end
 
 function updateDistances( graph , listCenters, initialDistances, meanDiff)
