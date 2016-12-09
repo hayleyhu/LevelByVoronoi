@@ -28,9 +28,7 @@ end
 
 astar.calculatePathDist = function ( nodeList )
 	local distance = 0
-	print "calculating path distance"
 	local lastNode = nodeList[1]
-	util.print_table(nodeList.edges)
 	for i=1,#nodeList - 1 do
 		if  nodeList[i].edges[nodeList[i + 1]] then
 			distance = distance + nodeList[i].edges[nodeList[i + 1]].weight
@@ -48,13 +46,11 @@ function heuristic_cost_estimate ( nodeA, nodeB )
 end
 
 function is_valid_node ( node, neighbor )
-	print "calculating valid node"
 	for i,v in ipairs(node.neighbors) do
 		if v==neighbor then
 			return true
 		end
 	end
-	print "not valid"
 	return false
 end
 
@@ -104,7 +100,6 @@ function remove_node ( set, theNode )
 end
 
 function unwind_path ( flat_path, map, current_node )
-
 	if map [ current_node ] then
 		table.insert ( flat_path, 1, map [ current_node ] ) 
 		return unwind_path ( flat_path, map, map [ current_node ] )
@@ -157,7 +152,6 @@ astar.solve = function ( start, goal, nodes, valid_node_func , distances)
 			end
 		end
 	end
-	print "No Valid Path"
 	return nil -- no valid path
 end
 

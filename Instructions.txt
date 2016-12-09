@@ -1,0 +1,12 @@
+Instructions for Running:
+
+This program is run using the lua binaries.
+
+Lua binaries for your system can be downloaded from the following site:
+http://luabinaries.sourceforge.net/download.html
+
+After downloading the binaries, on windows, you can run the program lua51.exe 
+on the lua files. 
+
+The file ExampleInput.exe shows a sample usage of the Weighted Voronoi calculationg
+program. 

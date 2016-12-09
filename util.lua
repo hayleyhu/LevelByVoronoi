@@ -267,10 +267,13 @@ function util.hasValue(table, goal)
     return false
 end
 
-function util.deleteFromTable(table, goal)
-    for index, value in ipairs (table) do
+function util.deleteFromTable(searchTable, goal)
+    for index, value in ipairs (searchTable) do
         if value == goal then
-            value = nil
+          --table[index] = nil
+            -- value = nil
+            table.remove(searchTable,index)
+            break
         end
     end
     return false
